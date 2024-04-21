@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>cast</title>
+</head>
+<body>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const query = params.get("q");
+        if (query === null) {
+            console.log("yoba");
+        } else {
+            console.log(query);
+            const parts = query.split(" ");
+            const request = parts.slice(1).join(" ");
+            const prefix_to_url = {
+                "!g": `https://www.google.com/search?q=${request}`,
+                "!py": `https://docs.python.org/3/search.html?q=${request}`,
+                "!pypi": `https://pypi.org/search/?q=${request}`,
+                "!docker": `https://hub.docker.com/search?q=${request}`,
+                "!yt": `https://www.youtube.com/results?search_query=${request}`,
+                "!tr": `https://translate.google.com/#auto/en/${request}`,
+                "!enru": `https://translate.google.com/#en/ru/${request}`,
+                "!ruen": `https://translate.google.com/#ru/en/${request}`,
+            };
+            const redirect_url = prefix_to_url[parts[0]] || prefix_to_url["!g"];
+            window.location.replace(redirect_url);
+        }
+    </script>
+</body>
+</html>

@@ -26,7 +26,7 @@
                 "!enru": `https://translate.google.com/#en/ru/${request}`,
                 "!ruen": `https://translate.google.com/#ru/en/${request}`,
             };
-            const default_redirect_url = `https://www.google.com/search?q=${query}`
+            const default_redirect_url = `https://www.google.com/search?q=${query}`;
             const redirect_url = prefix_to_url[parts[0]] || default_redirect_url;
             window.location.replace(redirect_url);
         }

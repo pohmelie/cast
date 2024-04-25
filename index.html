@@ -14,8 +14,6 @@
     <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.33.1/src-min/ace.js"></script>
 </head>
 <body>
-    <div id="editor">js-required</div>
-
     <script>
         const default_prefix_to_url_template_raw = `# Welcome to the cast: your cross-browser redirect tool.
 #
@@ -60,6 +58,9 @@
         const params = new URLSearchParams(window.location.search);
         const query = params.get("q");
         if (query === null) {
+            const editor_div = document.createElement("div");
+            editor_div.id = "editor";
+            document.body.appendChild(editor_div);
             const editor = ace.edit("editor");
             editor.setTheme("ace/theme/monokai");
             editor.session.setMode("ace/mode/yaml");

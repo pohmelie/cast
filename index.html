@@ -2,32 +2,81 @@
 <html>
 <head>
     <title>cast</title>
+    <style type="text/css" media="screen">
+        #editor {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.33.1/src-min/ace.js"></script>
 </head>
 <body>
+    <div id="editor">js-required</div>
+
     <script>
+        const default_prefix_to_url_template_raw = `# Welcome to the cast: your cross-browser redirect tool.
+#
+# The main goal of cast is to redirect your quires by prefix.
+# So you type "!g how to open a door" in browser address bar and you will be
+# redirected to google search.
+#
+# Configuration is pretty simple, you can add your own prefix to url template
+# mapping in a json format (with comments as lines started with #).
+# The {q} parameter will be substituted with your query. Configuration stored
+# in browser local storage.
+#
+# To make this work you need to customize search engine of your browser
+# to use such template: https://pohmelie.github.io/cast?q=%s
+{
+    "!g": "https://www.google.com/search?q={q}",
+    "!py": "https://docs.python.org/3/search.html?q={q}",
+    "!pypi": "https://pypi.org/search/?q={q}",
+    "!docker": "https://hub.docker.com/search?q={q}",
+    "!yt": "https://www.youtube.com/results?search_query={q}",
+    "!m": "https://www.google.com/maps/search/{q}",
+    "!w": "https://ru.wikipedia.org/wiki/{q}",
+    "!tr": "https://translate.google.com/#auto/en/{q}",
+    "!enru": "https://translate.google.com/#en/ru/{q}",
+    "!ruen": "https://translate.google.com/#ru/en/{q}"
+}
+`;
+        strip_comments = (s) => {
+            return s.replace(/^#.*$/gm, '');
+        }
+        let prefix_to_url_template_raw = "";
+        let prefix_to_url_template = "";
+        try {
+            prefix_to_url_template_raw = localStorage.getItem("prefix_to_url_template");
+            prefix_to_url_template = JSON.parse(strip_comments(prefix_to_url_template_raw));
+        } catch (e) {
+            prefix_to_url_template_raw = default_prefix_to_url_template_raw;
+            prefix_to_url_template = JSON.parse(strip_comments(prefix_to_url_template_raw));
+            localStorage.setItem("prefix_to_url_template", prefix_to_url_template_raw);
+        }
+
         const params = new URLSearchParams(window.location.search);
         const query = params.get("q");
         if (query === null) {
-            console.log("yoba");
+            const editor = ace.edit("editor");
+            editor.setTheme("ace/theme/monokai");
+            editor.session.setMode("ace/mode/yaml");
+            editor.setValue(prefix_to_url_template_raw);
+            editor.selection.clearSelection();
+            editor.gotoLine(0);
+            editor.setFontSize("100%");
+            editor.focus();
+            editor.on("change", () => {
+                localStorage.setItem("prefix_to_url_template", editor.getValue());
+            });
         } else {
-            console.log(query);
             const parts = query.split(" ");
             const request = parts.slice(1).join(" ");
-            const prefix_to_url = {
-                "!g": `https://www.google.com/search?q=${request}`,
-                "!py": `https://docs.python.org/3/search.html?q=${request}`,
-                "!pypi": `https://pypi.org/search/?q=${request}`,
-                "!docker": `https://hub.docker.com/search?q=${request}`,
-                "!yt": `https://www.youtube.com/results?search_query=${request}`,
-                "!m": `https://www.google.com/maps/search/${request}`,
-                "!w": `https://ru.wikipedia.org/wiki/${request}`,
-                // translate
-                "!tr": `https://translate.google.com/#auto/en/${request}`,
-                "!enru": `https://translate.google.com/#en/ru/${request}`,
-                "!ruen": `https://translate.google.com/#ru/en/${request}`,
-            };
-            const default_redirect_url = `https://www.google.com/search?q=${query}`;
-            const redirect_url = prefix_to_url[parts[0]] || default_redirect_url;
+            const default_redirect_template_url = "https://www.google.com/search?q={q}";
+            const redirect_url_template = prefix_to_url_template[parts[0]] || default_redirect_url_template;
+            const redirect_url= redirect_url_template.replace("{q}", request);
             window.location.replace(redirect_url);
         }
     </script>

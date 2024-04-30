@@ -79,7 +79,7 @@
             const parts = query.split(" ");
             const request = parts.slice(1).join(" ");
             const default_redirect_template_url = "https://www.google.com/search?q={q}";
-            const redirect_url_template = prefix_to_url_template[parts[0]] || default_redirect_url_template;
+            const redirect_url_template = prefix_to_url_template[parts[0]] || default_redirect_template_url;
             const redirect_url= redirect_url_template.replace("{q}", request);
             window.location.replace(redirect_url);
         }

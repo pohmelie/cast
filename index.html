@@ -45,7 +45,7 @@
 }
 `;
         strip_comments = (s) => {
-            return s.replace(/^#.*$/gm, '');
+            return s.replace(/^#.*$/gm, "");
         }
         let prefix_to_url_template_raw = "";
         let prefix_to_url_template = "";
@@ -76,9 +76,12 @@
                 localStorage.setItem("prefix_to_url_template", editor.getValue());
             });
         } else {
-            const parts = query.split(" ");
-            const request = parts.slice(1).join(" ");
             const default_redirect_template_url = "https://www.google.com/search?q={q}";
+            let request = query;
+            const parts = query.split(" ");
+            if (parts[0] in prefix_to_url_template) {
+                request = parts.slice(1).join(" ");
+            }
             const redirect_url_template = prefix_to_url_template[parts[0]] || default_redirect_template_url;
             const redirect_url= redirect_url_template.replace("{q}", request);
             window.location.replace(redirect_url);
